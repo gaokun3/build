@@ -40,7 +40,7 @@ HX83121A 是触摸/显示集成芯片。[right 的讨论](https://github.com/rig
 
 在 systemd-boot 菜单选中测试项按 `e`，临时编辑内核命令行。每次从原始命令行开始，只做一项测试，不将这些选项永久写入镜像。若有 Secure Boot 等限制不允许编辑，可使用已有的备用启动项收集日志。
 
-1. **仅禁用触摸模块**：追加 `module_blacklist=himax_hx83121a_spi`。这次没有触摸输入，使用键盘。如果不再花屏，优先检查触摸与面板时序，并参考 right 的现有传输/生命周期修复；不能因此认定 DSC 无问题。
+1. **仅禁用触摸模块**：追加 `module_blacklist=i2c_hid_of`（用 touch-spi dtb 时改为 `module_blacklist=himax_thp`）。这次没有触摸输入，使用键盘。如果不再花屏，优先检查触摸与面板时序，并参考 right 的现有传输/生命周期修复；不能因此认定 DSC 无问题。
 2. **仅关闭 DSC**：追加 `panel_himax_hx83121a.enable_dsc=0`。驱动已提供此参数，使用非 DSC 的 60 Hz 模式。如果恢复正常，只能将范围缩到 DSC 模式相关的时序/时钟/面板初始化，不能唯一定位宽度计算。
 3. **必要时阻止 MSM 接管**：追加 `module_blacklist=msm`。若保留固件 framebuffer 后不再花屏，说明与原生显示接管相关；此模式无正常 MSM 图形加速，仅用于诊断。
 

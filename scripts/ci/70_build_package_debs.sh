@@ -99,6 +99,10 @@ build_kernel_variant() {
   local out_dir="$4"
   local krel="$5"
   local dtb_name="$6"
+  # Further DTBs to ship next to the default one, selectable through
+  # /etc/kernel/devicetree (the postinst keeps a value set there)
+  local extra_dtbs="${7:-}"
+  local extra_dtb
 
   local deb_version="${krel//-/\~}-1"
   local image_pkg="linux-image-gaokun3${pkg_suffix}"
@@ -125,6 +129,10 @@ build_kernel_variant() {
     "$image_stage/boot/dtb-$krel"
   install -Dm644 "$out_dir/arch/arm64/boot/dts/qcom/$dtb_name" \
     "$image_stage/usr/lib/linux-image-$krel/qcom/$dtb_name"
+  for extra_dtb in $extra_dtbs; do
+    install -Dm644 "$out_dir/arch/arm64/boot/dts/qcom/$extra_dtb" \
+      "$image_stage/usr/lib/linux-image-$krel/qcom/$extra_dtb"
+  done
 
   make -C "$src_dir" O="$out_dir" ARCH=arm64 INSTALL_MOD_PATH="$modules_raw_stage" modules_install
   mv "$modules_raw_stage/lib/modules" "$modules_stage/lib/"
@@ -241,8 +249,10 @@ build_firmware_package() {
   FIRMWARE_DEB="$firmware_deb"
 }
 
+# The touch-spi DTB switches the touch controllers from I2C-HID to SPI for
+# the himax-thp transport and a userspace touch daemon (EGoTouchRev)
 build_kernel_variant "standard" "" "$KERN_SRC_BASE" "$KERN_OUT" "$BASE_KREL" \
-  "sc8280xp-huawei-gaokun3.dtb"
+  "sc8280xp-huawei-gaokun3.dtb" "sc8280xp-huawei-gaokun3-touch-spi.dtb"
 
 if [[ "$BUILD_EL2" == "true" ]]; then
   : "${KERN_OUT_EL2:?missing KERN_OUT_EL2}"

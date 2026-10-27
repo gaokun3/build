@@ -288,21 +288,9 @@ sudo cp -r $FW_REPO/. $ROOTFS_DIR/lib/firmware/
 
 # Install project's device-specific scripts and services
 sudo mkdir -p $ROOTFS_DIR/usr/local/bin
-sudo mkdir -p $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner
 sudo mkdir -p $ROOTFS_DIR/etc/systemd/system
 sudo mkdir -p $ROOTFS_DIR/usr/share/alsa/ucm2/Qualcomm/sc8280xp
 sudo mkdir -p $ROOTFS_DIR/usr/share/applications
-
-# Touchscreen tuner script and desktop entry
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune \
-    $ROOTFS_DIR/usr/local/bin/touchscreen-tune
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/tune.py \
-    $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner/tune.py
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/tune-icon.svg \
-    $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner/tune-icon.svg
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune.desktop \
-    $ROOTFS_DIR/usr/share/applications/touchscreen-tune.desktop
-sudo chmod +x $ROOTFS_DIR/usr/local/bin/touchscreen-tune
 
 # GDM monitor sync script and service
 sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync \

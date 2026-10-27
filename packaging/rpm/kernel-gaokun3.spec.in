@@ -46,9 +46,18 @@ if [ "$1" -ge 1 ] && command -v kernel-install >/dev/null 2>&1 &&
     fi
     cmdline="${cmdline%" "}"
 
+    # Keep a DTB selected in /etc/kernel/devicetree if this kernel ships it
+    # (sc8280xp-huawei-gaokun3-touch-spi.dtb for a userspace touch daemon);
+    # anything else gets the default DTB.
+    dtb="qcom/@DTB_FILE@"
+    selected="$(tr -d '[:space:]' </etc/kernel/devicetree 2>/dev/null || :)"
+    if [ -n "$selected" ] && [ -f "/usr/lib/modules/@KREL@/dtb/$selected" ]; then
+        dtb="$selected"
+    fi
+
     printf 'layout=bls\n' > "$temp_conf_root/install.conf"
     printf '%s\n' "$cmdline" > "$temp_conf_root/cmdline"
-    printf 'qcom/@DTB_FILE@\n' > "$temp_conf_root/devicetree"
+    printf '%s\n' "$dtb" > "$temp_conf_root/devicetree"
 
     install -d /etc/kernel/install.d
     ln -sf /dev/null /etc/kernel/install.d/51-dracut-rescue.install
@@ -64,6 +73,17 @@ if [ "$1" -ge 1 ] && command -v kernel-install >/dev/null 2>&1 &&
         kernel-install --make-entry-directory=yes --entry-token=os-id add \
         @KREL@ /boot/vmlinuz-@KREL@ ||
         echo "warning: kernel-install failed for @KREL@, it has no boot entry" >&2
+
+    # The package name carries no kernel release, so an upgrade replaces the
+    # previous kernel without running %preun with 0 and leaves its entry
+    # behind. Drop entries of kernels whose image is gone.
+    os_id="$(. /etc/os-release; echo "$ID")"
+    for entry in "$(bootctl --print-esp-path)"/loader/entries/"$os_id"-*.conf; do
+        [ -f "$entry" ] || continue
+        old="$(basename "$entry" .conf)"
+        old="${old#"$os_id"-}"
+        [ -e "/boot/vmlinuz-$old" ] || kernel-install --entry-token=os-id remove "$old" || :
+    done
 
     # As on stock Fedora, installing a kernel makes it the one that boots.
     # Only the standard kernel claims the default; EL2 is opted into from the

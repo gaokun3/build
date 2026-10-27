@@ -225,21 +225,9 @@ sudo cp -r $FW_REPO/. $ROOTFS_DIR/lib/firmware/
 
 # 安装项目内的设备专属脚本与服务
 sudo mkdir -p $ROOTFS_DIR/usr/local/bin
-sudo mkdir -p $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner
 sudo mkdir -p $ROOTFS_DIR/etc/systemd/system
 sudo mkdir -p $ROOTFS_DIR/usr/share/alsa/ucm2/Qualcomm/sc8280xp
 sudo mkdir -p $ROOTFS_DIR/usr/share/applications
-
-# 触摸屏调参工具和桌面入口
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune \
-    $ROOTFS_DIR/usr/local/bin/touchscreen-tune
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/tune.py \
-    $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner/tune.py
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/tune-icon.svg \
-    $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner/tune-icon.svg
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune.desktop \
-    $ROOTFS_DIR/usr/share/applications/touchscreen-tune.desktop
-sudo chmod +x $ROOTFS_DIR/usr/local/bin/touchscreen-tune
 
 # GDM 显示器同步脚本和服务
 sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync \
@@ -439,8 +427,8 @@ exit
 
 ### 触屏驱动鸣谢
 
-- [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)：本仓库直接集成的 `himax_hx83121a_spi` 触屏驱动与调参算法的主要上游来源。
-- [awarson2233/EGoTouchRev](https://github.com/awarson2233/EGoTouchRev)：EGoTouchRev-Linux 所参考的 Windows 侧触控算法项目，也是本方案触摸算法调参与行为的重要上游来源。
+- [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux)：此前内置的 `himax_hx83121a_spi` 触摸屏内核驱动与调参工具的来源，本仓库已不再包含。
+- [awarson2233/EGoTouchRev](https://github.com/awarson2233/EGoTouchRev)：配合 `sc8280xp-huawei-gaokun3-touch-spi.dtb` 与 `himax-thp` SPI 传输驱动使用的用户态触控守护进程（egotouchd）；不安装时触摸走默认设备树的 I2C-HID。
 
 ### 4. 收尾清理
 

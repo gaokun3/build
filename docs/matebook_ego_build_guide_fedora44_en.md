@@ -225,21 +225,9 @@ sudo cp -r $FW_REPO/. $ROOTFS_DIR/lib/firmware/
 
 # Install project's device-specific scripts and services
 sudo mkdir -p $ROOTFS_DIR/usr/local/bin
-sudo mkdir -p $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner
 sudo mkdir -p $ROOTFS_DIR/etc/systemd/system
 sudo mkdir -p $ROOTFS_DIR/usr/share/alsa/ucm2/Qualcomm/sc8280xp
 sudo mkdir -p $ROOTFS_DIR/usr/share/applications
-
-# Touchscreen tuner script and desktop entry
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune \
-    $ROOTFS_DIR/usr/local/bin/touchscreen-tune
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/tune.py \
-    $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner/tune.py
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/tune-icon.svg \
-    $ROOTFS_DIR/usr/local/lib/gaokun-touchscreen-tuner/tune-icon.svg
-sudo cp $GAOKUN_DIR/tools/touchscreen-tuner/touchscreen-tune.desktop \
-    $ROOTFS_DIR/usr/share/applications/touchscreen-tune.desktop
-sudo chmod +x $ROOTFS_DIR/usr/local/bin/touchscreen-tune
 
 # GDM monitor sync script and service
 sudo cp $GAOKUN_DIR/tools/monitors/gdm-monitor-sync \
@@ -439,8 +427,8 @@ Notes:
 
 ### Touchscreen Driver Acknowledgments
 
-- [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux): The source and main upstream reference for the directly integrated `himax_hx83121a_spi` touchscreen driver and tuning algorithm in this repository.
-- [awarson2233/EGoTouchRev](https://github.com/awarson2233/EGoTouchRev): The Windows-side touch algorithm project referenced by EGoTouchRev-Linux, also an important upstream source for touch algorithm tuning and behavior in this solution.
+- [chiyuki0325/EGoTouchRev-Linux](https://github.com/chiyuki0325/EGoTouchRev-Linux): The source of the former in-kernel `himax_hx83121a_spi` touchscreen driver and touchscreen tuner, which this repository no longer ships.
+- [awarson2233/EGoTouchRev](https://github.com/awarson2233/EGoTouchRev): The userspace touch daemon (egotouchd) for `sc8280xp-huawei-gaokun3-touch-spi.dtb` and the `himax-thp` SPI transport; without it touch runs through the default I2C-HID device tree.
 
 ### 4. Final Cleanup
 

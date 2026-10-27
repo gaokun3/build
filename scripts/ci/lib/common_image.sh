@@ -38,7 +38,6 @@ install_common_image_assets() {
   local gaokun_dir="$2"
   local executable_assets=(
     "tools/bluetooth/patch-nvm-bdaddr.py:/usr/local/bin/patch-nvm-bdaddr.py"
-    "tools/touchscreen-tuner/touchscreen-tune:/usr/local/bin/touchscreen-tune"
   )
   local service_assets=(
     "tools/bluetooth/patch-nvm-bdaddr.service:/etc/systemd/system/patch-nvm-bdaddr.service"
@@ -47,9 +46,6 @@ install_common_image_assets() {
     "tools/audio/sc8280xp.conf:/usr/share/alsa/ucm2/Qualcomm/sc8280xp/sc8280xp.conf"
     "tools/audio/HUAWEI-Gaokun3.conf:/usr/share/alsa/ucm2/Qualcomm/sc8280xp/HUAWEI-Gaokun3.conf"
     "tools/audio/51-gaokun-audio.conf:/etc/wireplumber/wireplumber.conf.d/51-gaokun-audio.conf"
-    "tools/touchscreen-tuner/tune.py:/usr/local/lib/gaokun-touchscreen-tuner/tune.py"
-    "tools/touchscreen-tuner/tune-icon.svg:/usr/local/lib/gaokun-touchscreen-tuner/tune-icon.svg"
-    "tools/touchscreen-tuner/touchscreen-tune.desktop:/usr/share/applications/touchscreen-tune.desktop"
     # The panel is portrait and has to be rotated before anyone has logged in.
     # mutter reads this system-level file in every session, so it covers the
     # first-boot setup screen and the login screen, which run as their own users,
@@ -65,7 +61,6 @@ install_common_image_assets() {
     "$rootfs_dir/etc/xdg" \
     "$rootfs_dir/etc/gaokun" \
     "$rootfs_dir/usr/local/bin" \
-    "$rootfs_dir/usr/local/lib/gaokun-touchscreen-tuner" \
     "$rootfs_dir/usr/share/alsa/ucm2/Qualcomm/sc8280xp" \
     "$rootfs_dir/usr/share/applications"
 

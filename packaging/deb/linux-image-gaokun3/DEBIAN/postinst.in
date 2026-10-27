@@ -13,11 +13,31 @@ trap cleanup EXIT
 mkdir -p /etc/kernel
 # Read by the systemd-boot hook invoked through update-initramfs.
 printf 'ubuntu\n' > /etc/kernel/entry-token
+# Keep a DTB selected in /etc/kernel/devicetree if this kernel ships it
+# (sc8280xp-huawei-gaokun3-touch-spi.dtb for a userspace touch daemon);
+# anything else gets the default DTB.
+dtb="qcom/@DTB_NAME@"
+selected="$(tr -d '[:space:]' < /etc/kernel/devicetree 2>/dev/null || true)"
+if [ -n "$selected" ] && [ -f "/usr/lib/linux-image-@KREL@/$selected" ]; then
+  dtb="$selected"
+fi
 for name in install.conf cmdline devicetree; do
   if [ -f "/etc/kernel/$name" ]; then
     cp "/etc/kernel/$name" "$temp_kernel_dir/$name.orig"
   fi
 done
 printf 'layout=bls\n' > /etc/kernel/install.conf
-printf 'qcom/@DTB_NAME@\n' > /etc/kernel/devicetree
+printf '%s\n' "$dtb" > /etc/kernel/devicetree
 update-initramfs -c -k @KREL@ 2>/dev/null || true
+
+# The package name carries no kernel release, so an upgrade replaces the
+# previous kernel's files but leaves its boot entry. Drop entries of kernels
+# whose image is gone. Image builds have no ESP and skip this.
+if esp="$(bootctl --print-esp-path 2>/dev/null)"; then
+  for entry in "$esp"/loader/entries/ubuntu-*.conf; do
+    [ -f "$entry" ] || continue
+    old="$(basename "$entry" .conf)"
+    old="${old#ubuntu-}"
+    [ -e "/boot/vmlinuz-$old" ] || kernel-install --entry-token=os-id remove "$old" || true
+  done
+fi

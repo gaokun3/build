@@ -68,6 +68,10 @@ build_variant_rpms() {
   local out_dir="$4"
   local krel="$5"
   local dtb_name="$6"
+  # Further DTBs to ship next to the default one, selectable through
+  # /etc/kernel/devicetree
+  local extra_dtbs="${7:-}"
+  local extra_dtb
 
   local is_default_kernel="0"
   [[ -z "$pkg_suffix" ]] && is_default_kernel="1"
@@ -99,6 +103,10 @@ build_variant_rpms() {
     "$kernel_stage/boot/config-$krel"
   install -Dm644 "$out_dir/arch/arm64/boot/dts/qcom/$dtb_name" \
     "$kernel_stage/boot/dtb-$krel/qcom/$dtb_name"
+  for extra_dtb in $extra_dtbs; do
+    install -Dm644 "$out_dir/arch/arm64/boot/dts/qcom/$extra_dtb" \
+      "$kernel_stage/boot/dtb-$krel/qcom/$extra_dtb"
+  done
   cat > "$kernel_stage/usr/lib/dracut/dracut.conf.d/$dracut_conf" <<'EOF'
 hostonly="no"
 # Keep btrfs available for existing installations; new images use ext4.
@@ -111,6 +119,10 @@ EOF
   rm -rf "$modules_raw_stage"
   install -Dm644 "$out_dir/arch/arm64/boot/dts/qcom/$dtb_name" \
     "$modules_stage/usr/lib/modules/$krel/dtb/qcom/$dtb_name"
+  for extra_dtb in $extra_dtbs; do
+    install -Dm644 "$out_dir/arch/arm64/boot/dts/qcom/$extra_dtb" \
+      "$modules_stage/usr/lib/modules/$krel/dtb/qcom/$extra_dtb"
+  done
   rm -f "$modules_stage/usr/lib/modules/$krel/build" \
         "$modules_stage/usr/lib/modules/$krel/source"
   ln -s ../usr/lib/modules "$modules_stage/lib/modules"
@@ -220,7 +232,7 @@ rpmbuild_common_args=(
 )
 
 build_variant_rpms "standard" "" "$KERN_SRC_BASE" "$KERN_OUT" "$BASE_KREL" \
-  "sc8280xp-huawei-gaokun3.dtb"
+  "sc8280xp-huawei-gaokun3.dtb" "sc8280xp-huawei-gaokun3-touch-spi.dtb"
 
 if [[ "$BUILD_EL2" == "true" ]]; then
   : "${KERN_OUT_EL2:?missing KERN_OUT_EL2}"
